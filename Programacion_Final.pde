@@ -1,3 +1,7 @@
+import ddf.minim.*;
+Minim minim;
+AudioPlayer song; 
+AudioPlayer song2;
 
 int xFondo,xFondo2, index, estado, estado1, obs2,entobstacle,indexmur = 0, indexmina = 0, indexbruja = 0, indexconejo = 0;
 float x1,y1,r1,r2,o;
@@ -13,14 +17,14 @@ int k = 0;
 int b, c, m, batman;
 
 Boton i,i2,i3;
-
 void setup(){
 size (1000,600);
 x1 = 260;
 y1 = 490;
 r1 = 60;
 r2 = 30;
-
+minim = new Minim(this);
+song = minim.loadFile("Halo.mp3");
 Inicio = loadImage("Inicio.PNG");
 Fondo = loadImage("fondonieve2.jpg");
 piso= loadImage("pisorocas.png");
@@ -112,6 +116,7 @@ void draw(){
   i2.dibujar();
   i3.dibujar(); 
     background(255);
+    song.play();
     image(Inicio,xFondo,0,1000,600);
     image(Inicio,xFondo2,0,1000,600);
     
@@ -122,6 +127,7 @@ void draw(){
 if (estado == 1){
   //Portada
 background(255);
+song.play();
     image(Inicio,xFondo,0,1000,600);
     image(Inicio,xFondo2,0,1000,600);
     
@@ -130,6 +136,7 @@ background(255);
 }
 
 if (estado == 2){
+      song.close();
 xFondo = xFondo - 35;
 xFondo2 = xFondo2 - 35;
 p=0;
@@ -272,7 +279,7 @@ o = sqrt(pow(x6-x1, 2) + pow(y6-y1, 2));
     }
 }
 if (estado == 3){
-    
+     song.close();
     image(instrucciones,xFondo,0,1000,600);
     image(instrucciones,xFondo2,0,1000,600);
 }
@@ -299,4 +306,11 @@ void keyPressed(){
   {
   estado1 = 2;
   }
+}
+void stop()
+{
+  song.close();
+  song2.close();
+  minim.stop();
+  super.stop();
 }
