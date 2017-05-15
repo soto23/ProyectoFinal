@@ -1,32 +1,40 @@
+import ddf.minim.*;
+Minim minim;
+AudioPlayer song; 
+AudioPlayer song2;
 
 int xFondo,xFondo2, index, estado, estado1, obs2,entobstacle,indexmur = 0, indexmina = 0, indexbruja = 0, indexconejo = 0;
 float x1,y1,r1,r2,o;
 PImage sprites[],mur[],mina[],bruja[],conejo[];
-PImage Inicio,Fondo,piso,roca, instrucciones,vida;
+PImage Inicio,Fondo,piso,roca, instrucciones,vida,gameOver;
 float a,inc,timer,randobstacle,rand1=1000,rand2=1000;
-int p;
+int p,t;
 int xentero = 0;
-float [] ARR = new float [20];
-int limite = 20;
+float [] ARR = new float [25];
+int [] ARR2 = new int [10];
+int limite = 25;
 float x;
 int k = 0;
 int b, c, m, batman;
+int colision = 0, vidas = 3;
 
 Boton i,i2,i3;
-
 void setup(){
 size (1000,600);
 x1 = 260;
 y1 = 490;
 r1 = 60;
 r2 = 30;
-
+minim = new Minim(this);
+song = minim.loadFile("Halo.mp3");
+song2 = minim.loadFile("Brinstar.mp3");
 Inicio = loadImage("Inicio.PNG");
 Fondo = loadImage("fondonieve2.jpg");
 piso= loadImage("pisorocas.png");
 roca = loadImage("rock.png");
-instrucciones = loadImage("Instrucciones1.png");
+instrucciones = loadImage("Instrucciones2.png");
 vida = loadImage("vida.png");
+gameOver = loadImage("GameOver.png");
 xFondo=0;
 xFondo2=1000;
 index = 0;
@@ -105,6 +113,7 @@ inc= TWO_PI/30.0;
   conejo[3] = loadImage("conejo4.png");
   conejo[4] = loadImage("conejo5.png");
   
+      song.play();
 }
 void draw(){
   
@@ -112,6 +121,7 @@ void draw(){
   i2.dibujar();
   i3.dibujar(); 
     background(255);
+  
     image(Inicio,xFondo,0,1000,600);
     image(Inicio,xFondo2,0,1000,600);
     
@@ -122,6 +132,7 @@ void draw(){
 if (estado == 1){
   //Portada
 background(255);
+    song.play();
     image(Inicio,xFondo,0,1000,600);
     image(Inicio,xFondo2,0,1000,600);
     
@@ -130,14 +141,16 @@ background(255);
 }
 
 if (estado == 2){
+      song.close();
+      song2.play();
 xFondo = xFondo - 35;
 xFondo2 = xFondo2 - 35;
 p=0;
-     
-
     image(Fondo,xFondo,0,1000,600);
     image(Fondo,xFondo2,0,1000,600);
-    for(int i = 0;i<3;i++){
+    
+    
+    for(t = 0;t<3;t++){
     image(vida,p,0,50,50);  
     p +=35;
     }
@@ -169,99 +182,122 @@ if (millis() > timer){//Cada cuanto tiempo se va a imprimir los obstáculos
     rand1 = rand1 + 500;//Limite inferior de la coordenada randon en x
     rand2 = rand2 + 500;//Limite superior de la coordenada random en x
     
-     x = random(rand1, rand2);//Imrpime un número random que se usa como la coordenada en x donde aparece el obstáculo
-     xentero = int(x);//Convierte la coordenada de flotante a entera
+    x = random(rand1, rand2);//Imrpime un número random que se usa como la coordenada en x donde aparece el obstáculo
+    xentero = int(x);//Convierte la coordenada de flotante a entera
     ARR[k] = xentero;//Guarda en la celda el valor de la coordenada
     k = k + 1;//Le suma 1 al indice que es k
-    timer = millis() + 1000;//Le suma 1000 para que se haga cada segundo
+    timer = millis() + 850;//Le suma 1000 para que se haga cada segundo
     c = batman = b = m =  xentero;//Asigna el valor de la coordenada a los indices del arreglo de cada obstáculo
     
-     randobstacle = random(0, 3.99);//Imrpime un número random entre 0 y 3 para escoger que obstáculo 
+    randobstacle = random(0, 3.99);//Imrpime un número random entre 0 y 3 para escoger que obstáculo 
     entobstacle = int(randobstacle);//Lo convierte a entero
   }
    
     
   if(entobstacle == 0){//Escoge que obstáculo imprimir
-    for (batman = 0; batman < 20; batman++){
+    for (batman = 0; batman < 10; batman++){
      if (ARR[batman] > 0){
           ARR[batman] = ARR[batman] - 30;//Le va restand0 30 en x al obstáculo
-          indexmur = (millis() / 125) % 3;//Imrpime los sprites para hacer la animacion del obstaculo
-          image(mur[indexmur], ARR[batman], 350);//Imrpime el obstaculo
           float x3 = ARR[batman] + 150, y3 = 485;
 
 if (y1-sin(a)*300 > 300 && y1<600){        // Colisión    
-o = sqrt(pow(x3-x1, 2) + pow(y3-y1, 2));  
+    o = sqrt(pow(x3-x1, 2) + pow(y3-y1, 2));  
+     ellipse(x3, y3, 2*r2, 2*r2); 
     if (o < r1+r2) {
-
-      
+        indexmur = (millis() / 125) % 3;//Imrpime los sprites para hacer la animacion del obstaculo
+          image(mur[indexmur], ARR[batman], 350);//Imrpime el obstaculo
     fill(255,0,0);
+    colision = colision + 1;
+    if(colision > 4)
+    {
+      vidas = vidas - 1;
+    }
   }else {
+    indexmur = (millis() / 125) % 3;//Imrpime los sprites para hacer la animacion del obstaculo
+          image(mur[indexmur], ARR[batman], 350);//Imrpime el obstaculo
     fill(255);
   }
 }
-            ellipse(x3, y3, 2*r2, 2*r2); 
 }
    }
     }
     if(entobstacle == 1){
-    for (m=0; m < 20; m++){
-     if (ARR[m] > 0){
+    for (m=0; m < 10; m++){
+    if (ARR[m] > 0){
           ARR[m] = ARR[m] - 30;
           float x4 = ARR[m] + 155, y4 = 550;
           if (y1-sin(a)*300 > 300 && y1<600){    // Colisión    
-o = sqrt(pow(x4-x1, 2) + pow(y4-y1, 2));  
-    if (o < r1+r2) {
+          o = sqrt(pow(x4-x1, 2) + pow(y4-y1, 2)); 
+          ellipse(x4, y4, 2*r2, 2*r2); 
+    if (o < r1+r2) {  
     indexmina = ((millis() / 125) % 8) + 1;
     image(mina[indexmina], ARR[m], 295);  
     fill(255,0,0);
+     colision = colision + 1;
+    if(colision > 4)
+    {
+      vidas = vidas - 1;
+    }
   }else {
     indexmina = (millis() / 125) % 1;
     image(mina[indexmina], ARR[m], 295);
     fill(255);
   }
 }
-          ellipse(x4, y4, 2*r2, 2*r2); 
+        
        }
     }
 }
     if(entobstacle == 2){
-    for (b = 0; b < 20; b++){
+    for (b = 0; b < 10; b++){
      if (ARR[b] > 0){
           ARR[b] = ARR[b] - 30;
-          indexbruja = (millis() / 125) % 3;
-          image(bruja[indexbruja], ARR[b], 350);
           float x5 = ARR[b] + 50, y5 = 430;
-          println(y1-sin(a)*300);
-          if (y1-sin(a)*300 > 300 && y1<600){      // Colisión    
-o = sqrt(pow(x5-x1, 2) + pow(y5-y1, 2));  
+          if (y1-sin(a)*300 > 300 && y1<600){      // Colisión            
+o = sqrt(pow(x5-x1, 2) + pow(y5-y1, 2)); 
+ellipse(x5, y5, 2*r2, 2*r2); 
     if (o < r1+r2) {
+       indexbruja = (millis() / 125) % 3;
+          image(bruja[indexbruja], ARR[b], 350);
     fill(255,0,0);
+     colision = colision + 1;
+    if(colision > 4)
+    {
+      vidas = vidas + 1;
+    }
   }else {
+       indexbruja = (millis() / 125) % 3;
+          image(bruja[indexbruja], ARR[b], 350);
     fill(255);
   }
 }
-          ellipse(x5, y5, 2*r2, 2*r2); 
        }
     }
    }
     if(entobstacle == 3){
-    for (c=0; c < 20; c++){
+    for (c=0; c < 10; c++){
      if (ARR[c] > 0){
           ARR[c] = ARR[c] - 30;
           float x6 = ARR[c] + 45,y6=540;
           if (y1-sin(a)*300 > 300 && y1<600){    // Colisión    
 o = sqrt(pow(x6-x1, 2) + pow(y6-y1, 2));  
+  ellipse(x6,y6,2*r2,2*r2); 
     if (o < r1+r2) {
         indexconejo = ((millis() / 200) % 3) + 2;
           image(conejo[indexconejo], ARR[c], 460);
     fill(255,0,0);
+     colision = colision + 1;
+    if(colision > 4)
+    {
+      vidas = vidas - 1;
+    }
   }else {
      indexconejo = (millis() / 200) % 2 ;
           image(conejo[indexconejo], ARR[c], 460);
     fill(255);
   }
 }
-          ellipse(x6,y6,2*r2,2*r2); 
+         
           }
       }
     }
@@ -272,14 +308,39 @@ o = sqrt(pow(x6-x1, 2) + pow(y6-y1, 2));
     }
 }
 if (estado == 3){
-    
+  
+  
     image(instrucciones,xFondo,0,1000,600);
     image(instrucciones,xFondo2,0,1000,600);
-}
+    
+          index = (millis() / 125) % 3;
+    image(mur[index], 425, 340);
+    
+        index = (millis() /125) % 10;
+    image(mina[index], -30, 280);
+    
+        index = (millis() /125) % 3;
+    image(bruja[index], 425, 280);
+    
+        index = (millis() /125) % 5;
+    image(conejo[index], 300, 420);
   
+  
+    
+}
+println("Vidas: "+vidas);
+println("colision: " +colision);
+
+
+if (colision > 4){
+  colision = 0;
+}
+if(vidas < 0 ){
+  image(gameOver,xFondo,0,1000,600);
+    image(gameOver,xFondo2,0,1000,600); 
 }
 
-
+}
 void mousePressed(){
  // iniciar
  if (i.press()){  
@@ -299,4 +360,11 @@ void keyPressed(){
   {
   estado1 = 2;
   }
+}
+void stop()
+{
+  song.close();
+  song2.close();
+  minim.stop();
+  super.stop();
 }
